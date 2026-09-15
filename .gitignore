@@ -30,6 +30,10 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Oo]ut/
+[Bb]uild/[Bb]in/
+frontend/wailsjs/
+graphify-out/
+.DS_Store
 [Ll]og/
 [Ll]ogs/
 

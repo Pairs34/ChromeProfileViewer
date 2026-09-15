@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser Profile Viewer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-bar">
+      <div class="brand">
+        <span class="brand-mark">BP</span>
+        <div>
+          <h1>Browser Profile Viewer</h1>
+          <p>Yerel tarayıcı profillerini bul ve aç</p>
+        </div>
+      </div>
+      <span id="browserStatus" class="browser-status">Tarayıcılar aranıyor</span>
+    </header>
+
+    <main>
+      <section id="dropZone" class="source-panel">
+        <label for="pathInput">Profil klasörü</label>
+        <div class="path-controls">
+          <input id="pathInput" type="text" placeholder="Chrome User Data veya Firefox Profiles klasörü" spellcheck="false">
+          <button id="chooseButton" class="button">Gözat</button>
+          <button id="scanButton" class="button primary">Tara</button>
+        </div>
+        <p>Klasörü bu alana sürükleyip bırakabilirsiniz.</p>
+      </section>
+
+      <section class="list-section">
+        <div class="list-toolbar">
+          <div>
+            <h2>Profiller</h2>
+            <p id="summary">Henüz klasör taranmadı.</p>
+          </div>
+          <div class="filters">
+            <input id="searchInput" class="search" type="search" placeholder="Profil ara" aria-label="Profil ara">
+            <select id="familyFilter" aria-label="Tarayıcı türü">
+              <option value="all">Tüm türler</option>
+              <option value="chromium">Chromium</option>
+              <option value="firefox">Firefox</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="warnings" class="notice" hidden></div>
+
+        <div id="profileTable" class="profile-table" hidden>
+          <div class="table-head">
+            <label class="check-cell"><input id="selectAll" type="checkbox" aria-label="Görünen profillerin tümünü seç"></label>
+            <span>Profil</span>
+            <span>Tarayıcı</span>
+            <span>Durum</span>
+            <span></span>
+          </div>
+          <div id="profiles"></div>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <p>Başlamak için profil klasörünü seçin.</p>
+          <span>Chrome için <b>User Data</b>, Firefox için <b>Profiles</b> klasörünü kullanabilirsiniz.</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="action-bar">
+      <label class="safe-option">
+        <input id="isolatedToggle" type="checkbox" checked>
+        <span>
+          <b>Güvenli kopya kullan</b>
+          <small>Orijinal profil değiştirilmez</small>
+        </span>
+      </label>
+      <div class="batch-actions">
+        <span id="selectionCount">0 profil seçili</span>
+        <button id="openSelectedButton" class="button primary" disabled>Seçilenleri aç</button>
+      </div>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>

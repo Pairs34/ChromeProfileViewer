@@ -1,0 +1,17 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "browser-profile-viewer",
+  "outputfilename": "BrowserProfileViewer",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "frontend:dev:serverUrl": "",
+  "author": {
+    "name": "ChromeProfileViewer contributors"
+  },
+  "info": {
+    "productName": "Browser Profile Viewer",
+    "productVersion": "0.1.0",
+    "comments": "Local Chrome, Chromium and Firefox profile launcher"
+  }
+}
