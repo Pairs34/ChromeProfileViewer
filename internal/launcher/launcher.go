@@ -70,6 +70,16 @@ func (s *Service) Launch(profile model.Profile, browserID string, isolated bool)
 	if err != nil {
 		return model.LaunchResult{}, err
 	}
+	if effective.Family == model.FamilyFirefox {
+		// Eski Firefox "profil daha yeni sürümle kullanılmış" uyarısı vermesin diye
+		// sürüm bilgisini tutan dosyayı sileriz; Firefox açılışta yeniden oluşturur.
+		if err := os.Remove(filepath.Join(effective.Path, "compatibility.ini")); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return model.LaunchResult{}, fmt.Errorf("compatibility.ini silinemedi (Firefox açık olabilir): %w", err)
+		}
+		if isolated {
+			args = append(args, "-allow-downgrade")
+		}
+	}
 	command := exec.Command(browser.Executable, args...)
 	if err := command.Start(); err != nil {
 		return model.LaunchResult{}, fmt.Errorf("tarayıcı başlatılamadı: %w", err)
@@ -137,6 +147,8 @@ var skippedCopyNames = map[string]bool{
 	"dawncache": true, "grshadercache": true, "crashpad": true,
 	"singletonlock": true, "singletoncookie": true, "singletonsocket": true,
 	"parent.lock": true, ".parentlock": true, "lock": true,
+	// Firefox: son çalışan sürümü tutar; eski Firefox "yeni profil oluştur" der.
+	"compatibility.ini": true, "startupcache": true, "cache2": true,
 }
 
 func copyDirectory(source, destination string) error {

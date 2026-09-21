@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/pairs/chrome-profile-viewer/internal/browser"
+	"github.com/pairs/chrome-profile-viewer/internal/inspect"
 	"github.com/pairs/chrome-profile-viewer/internal/launcher"
 	"github.com/pairs/chrome-profile-viewer/internal/model"
 	"github.com/pairs/chrome-profile-viewer/internal/profile"
@@ -34,6 +35,10 @@ func (a *App) DetectBrowsers() []model.Browser { return browser.Detect() }
 
 func (a *App) ScanDirectory(path string) (model.ScanResult, error) {
 	return profile.Scan(path, browser.Detect())
+}
+
+func (a *App) InspectProfile(selected model.Profile) (model.ProfileDetails, error) {
+	return inspect.Inspect(selected)
 }
 
 func (a *App) LaunchProfile(selected model.Profile, browserID string, isolated bool) (model.LaunchResult, error) {

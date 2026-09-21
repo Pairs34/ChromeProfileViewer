@@ -153,13 +153,22 @@ function profileRow(profile) {
   status.className = "status" + (profile.locked ? " locked" : "");
   status.textContent = profile.locked ? "Kullanımda" : "Hazır";
 
+  const detailButton = document.createElement("button");
+  detailButton.className = "button row-button";
+  detailButton.textContent = "Detay";
+  detailButton.addEventListener("click", () => showDetails(profile, detailButton));
+
   const openButton = document.createElement("button");
-  openButton.className = "button row-open";
+  openButton.className = "button row-button";
   openButton.textContent = "Aç";
   openButton.disabled = browserSelect.disabled;
   openButton.addEventListener("click", () => launchOne(profile, openButton));
 
-  row.append(checkCell, main, browserSelect, status, openButton);
+  const actions = document.createElement("div");
+  actions.className = "row-actions";
+  actions.append(detailButton, openButton);
+
+  row.append(checkCell, main, browserSelect, status, actions);
   return row;
 }
 
@@ -214,6 +223,98 @@ async function launchOne(profile, button) {
   }
 }
 
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ["KB", "MB", "GB"];
+  let value = bytes / 1024;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) { value /= 1024; unit++; }
+  return `${value.toFixed(value < 10 ? 1 : 0)} ${units[unit]}`;
+}
+
+function detailSection(title, content) {
+  const section = document.createElement("section");
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.append(heading, content);
+  return section;
+}
+
+function detailList(items) {
+  const list = document.createElement("ul");
+  for (const item of items) {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  }
+  return list;
+}
+
+function detailText(text) {
+  const p = document.createElement("p");
+  p.textContent = text;
+  return p;
+}
+
+function renderDetails(details) {
+  const body = byId("detailBody");
+  body.replaceChildren();
+
+  if (details.notes?.length) {
+    const notes = detailList(details.notes);
+    notes.className = "detail-notes";
+    body.appendChild(notes);
+  }
+  if (details.fields?.length) {
+    const grid = document.createElement("dl");
+    for (const field of details.fields) {
+      const term = document.createElement("dt");
+      term.textContent = field.label;
+      const value = document.createElement("dd");
+      value.textContent = field.value;
+      grid.append(term, value);
+    }
+    body.appendChild(detailSection("Genel", grid));
+  }
+  const history = details.history || [];
+  if (history.length) {
+    body.appendChild(detailSection(
+      `Geçmişte girilen siteler (${history.length}) · son ziyarete göre`,
+      detailList(history.map((site) => `${site.host} · ${site.visits} ziyaret · son: ${site.lastVisit}`)),
+    ));
+  }
+  const sites = details.sites || [];
+  body.appendChild(detailSection(
+    `Veri saklayan siteler (${sites.length}) · son değişikliğe göre`,
+    sites.length ? detailList(sites.map((site) => `${site.origin} · ${site.modified}`)) : detailText("Site verisi bulunamadı."),
+  ));
+  const extensions = details.extensions || [];
+  if (extensions.length) body.appendChild(detailSection(`Uzantılar (${extensions.length})`, detailList(extensions)));
+  if (details.files?.length) {
+    body.appendChild(detailSection("Dosyalar", detailList(
+      details.files.map((file) => `${file.name}${file.isDir ? "/" : ""} · ${formatSize(file.size)} · ${file.modified}`),
+    )));
+  }
+}
+
+async function showDetails(profile, button) {
+  const oldText = button.textContent;
+  button.disabled = true;
+  button.textContent = "...";
+  try {
+    const details = await backend().InspectProfile(profile);
+    byId("detailTitle").textContent = profile.name;
+    byId("detailPath").textContent = profile.path;
+    renderDetails(details);
+    byId("detailDialog").showModal();
+  } catch (error) {
+    toast(String(error), true);
+  } finally {
+    button.disabled = false;
+    button.textContent = oldText;
+  }
+}
+
 function updateSelection(visible = visibleProfiles()) {
   const selectedCount = state.selected.size;
   byId("selectionCount").textContent = `${selectedCount} profil seçili`;
@@ -250,6 +351,7 @@ byId("selectAll").addEventListener("change", (event) => {
   render();
 });
 byId("openSelectedButton").addEventListener("click", openSelected);
+byId("detailClose").addEventListener("click", () => byId("detailDialog").close());
 
 window.addEventListener("DOMContentLoaded", async () => {
   await refreshBrowsers();

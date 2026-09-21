@@ -43,3 +43,39 @@ type LaunchResult struct {
 	Isolated     bool     `json:"isolated"`
 	Arguments    []string `json:"arguments"`
 }
+
+type Field struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
+}
+
+type FileEntry struct {
+	Name     string `json:"name"`
+	Size     int64  `json:"size"`
+	Modified string `json:"modified"`
+	IsDir    bool   `json:"isDir"`
+}
+
+// Site is an origin that stores data in the profile; Modified is the newest
+// change to that data (a proxy for last use, since access times are unreliable).
+type Site struct {
+	Origin   string `json:"origin"`
+	Modified string `json:"modified"`
+}
+
+// HistorySite aggregates browsing history per host.
+type HistorySite struct {
+	Host      string `json:"host"`
+	Visits    int    `json:"visits"`
+	LastVisit string `json:"lastVisit"`
+}
+
+// ProfileDetails is a read-only summary of a profile; passwords and cookie values are never read.
+type ProfileDetails struct {
+	History    []HistorySite `json:"history"`
+	Fields     []Field     `json:"fields"`
+	Extensions []string    `json:"extensions"`
+	Sites      []Site      `json:"sites"`
+	Files      []FileEntry `json:"files"`
+	Notes      []string    `json:"notes"`
+}
