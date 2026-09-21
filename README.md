@@ -29,6 +29,12 @@ Güncel macOS SDK'sında doğrudan uygulama paketi üretmek için:
 open build/bin/BrowserProfileViewer.app
 ```
 
+Windows üretim derlemesi için PowerShell'de:
+
+```powershell
+.\scripts\build-windows.ps1
+```
+
 macOS paketi, bu projede kullanılan Go 1.25+ araç zinciri nedeniyle macOS 13+
 için üretilir. Windows üretim paketi `wails build` ile oluşturulabilir.
 
